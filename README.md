@@ -2,7 +2,7 @@
 Using Computer Vision techniques, extract a Sudoku board from a given photo and automatically show the solution.
 I will be using the following python libraries in my project: numpy, opencv, pytesseract, tkinter.
 
-The project consists of 3 phases:
+The project consists of 4 phases:
 1. Developing the Sudoku Solver class: Implement an algorithm that gets a 9x9 integer matrix that represents a single Sudoku's board as an input, and returns the final solution of the given board.
 Of course that an error will occur if the given board is illegal or could not be solved.
 2. Board extraction from a given photo: Given any picture, I need to use computer-vision techniques in order to successfully extract the board from it. I will be using opencv library for that purpose.
