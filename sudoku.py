@@ -19,6 +19,47 @@ class Sudoku:
         self.board = board
         self.options = list(list(set(range(1, 10)) for _ in range(9)) for _ in range(9))
         self.emptyCells = 9 * 9  # If zero - the puzzle is solved!
+        
+    def removeOption(self, row, col, value):
+        """ Remove the possibility of the 'value' digit to appear in the given row, given cell, and given sub-box.
+
+        :param row:     Row index.
+        :param col:     Column index.
+        :param value:   Value of digit to remove the possibility for.
+        """
+        # Remove value from row and column
+        for i in range(len(self.board)):
+            self.options[row][i].discard(value)
+            self.options[i][col].discard(value)
+
+        # Remove value from the corresponding 3x3 sub-box.
+        rowBox, colBox = row // 3, col // 3
+        for i in range(rowBox * 3, rowBox * 3 + 3):
+            for j in range(colBox * 3, colBox * 3 + 3):
+                self.options[i][j].discard(value)
+
+    def solve(self):
+        """ Solve the sudoku puzzle.
+
+        :return:         True if success, false if failed.
+        """
+        while self.emptyCells != 0:
+            for i in range(len(self.board)):
+                for j in range(len(self.board[0])):
+                    if len(self.options[i][j]) == 0:
+                        continue
+                    elif len(self.options[i][j]) == 1:
+                        value = self.options[i][j].pop()
+                        self.board[i][j] = value
+                        self.removeOption(i, j, value)
+
+                        self.emptyCells -= 1
+                    elif self.board[i][j] != 0:
+                        self.removeOption(i, j, self.board[i][j])
+                        self.options[i][j].clear()
+
+                        self.emptyCells -= 1
+        return True
    
     def printBoardToConsole(self, printOpt=False):
         """ Print the sudoku board to the console. Also print the options matrix if needed.
