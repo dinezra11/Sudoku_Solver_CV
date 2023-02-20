@@ -43,7 +43,13 @@ class Sudoku:
 
         :return:         True if success, false if failed.
         """
+        maxTry, tries = 10, 0 # Set the maximum tries for the algorithm to solve the board. (Avoid infinite-loop in case of impossible board)
+        
         while self.emptyCells != 0:
+            tries += 1
+            if tries == maxTry:
+                return False
+            
             for i in range(len(self.board)):
                 for j in range(len(self.board[0])):
                     if len(self.options[i][j]) == 0:
