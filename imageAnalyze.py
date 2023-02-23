@@ -9,8 +9,8 @@ Author:     Din Ezra     dinezra11@gmail.com
 """
 import cv2 as cv
 import numpy as np
-
-IMAGE_SIZE = 450 # Define a constant for the image resizing in the pre-processing stage
+import easyocr
+IMAGE_SIZE = 900 # Define a constant for the image resizing in the pre-processing stage
 
 
 def preProcessing(originalImg):
@@ -24,10 +24,10 @@ def preProcessing(originalImg):
     newImg = cv.GaussianBlur(newImg, (3, 3), 6)
     newImg = cv.adaptiveThreshold(newImg, 255, 1, 1, 11, 2)
 
-    return newImg
+    return originalImg, newImg
 
 
-def extractPuzzle(img):
+def extractPuzzle(img, processedImg):
     """ Find the biggest contours in the image, and use it as the Sudoku's board.
 
     :param img:         The pre-processed image.
@@ -56,7 +56,7 @@ def extractPuzzle(img):
         return sortedPoints
 
     # Find contours and get the biggest one (it will be the Sudoku's board)
-    contours, hierarchy = cv.findContours(img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE) # We only care about the contours
+    contours, hierarchy = cv.findContours(processedImg, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE) # We only care about the contours
     biggest = max(contours, key=cv.contourArea)
 
     # Get the approximation of the 4 points that construct the rectangle shape of the board.
@@ -80,6 +80,37 @@ def extractPuzzle(img):
     return croppedBoard
 
 
+def digitRecognition(img):
+    """ Split the cells from the Sudoku's image and use pytesseract OCR to make predictions for the digits.
+
+    :param img:         Image of the Sudoku's board.
+    :return:            2D array representing the Sudoku's board, after the digit classification.
+    """
+    # Pre-process the board image
+    img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    #img = cv.adaptiveThreshold(img, 255, 1, 1, 11, 2)
+    #ret, img = cv.threshold(img, 80, 255, cv.THRESH_BINARY)
+
+    # Extract the cells coordination from the full image
+    cells = []
+    for row in np.vsplit(img, 9):
+        for col in np.hsplit(row, 9):
+            cells.append(col)
+
+    # Call the model and get the predictions for the digits
+    cells = np.array(cells)
+    reader = easyocr.Reader(['en'])
+
+    results = list(list('' for _ in range(9)) for _ in range(9))
+    cellIndex = 0
+    for i in range(9):
+        for j in range(9):
+            results[i][j] = reader.readtext(cells[cellIndex], allowlist="0123456789")
+            cellIndex += 1
+
+    return results[0][0], cells[0]
+
+
 def loadImage(path):
     """ Get a path to the given Sudoku's board, analyze it and represent it as a 2D-array.
 
@@ -87,13 +118,16 @@ def loadImage(path):
     :return:            2D array representing the Sudoku's board.
     """
     img = cv.imread(path) # Load the image
-    img = preProcessing(img) # Pre-process the image
-    img = extractPuzzle(img) # Extract the Sudoku's board from the image
+    img, processedImg = preProcessing(img) # Pre-process the image
+    img = extractPuzzle(img, processedImg) # Extract the Sudoku's board from the image
+    cv.imshow("t", img)
+    result, img = digitRecognition(img)
 
     ### TESTING
+    print(result)
     cv.imshow("test", img)
     cv.waitKey(0)
     cv.destroyAllWindows()
 
 
-loadImage("example2.png")
+loadImage("example1.png")
