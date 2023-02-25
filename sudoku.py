@@ -43,8 +43,11 @@ class Sudoku:
 
         :return:         True if success, false if failed.
         """
-        maxTry, tries = 10, 0 # Set the maximum tries for the algorithm to solve the board. (Avoid infinite-loop in case of impossible board)
-        
+
+        # Set the maximum tries for the algorithm to solve the board. (Avoid infinite-loop in case of impossible board)
+        maxTry, tries = 10, 0
+
+        # Solving algorithm
         while self.emptyCells != 0:
             tries += 1
             if tries == maxTry:
@@ -82,7 +85,8 @@ class Sudoku:
 
                 row = "| "
                 for j in range(len(matrix[0])):
-                    row += str(matrix[i][j]) + " "
+                    output = str(matrix[i][j]) if str(matrix[i][j]) != '0' else ' ' # Value 0 indicates an empty cell
+                    row += output + " "
 
                     if (j + 1) % 3 == 0:
                         row += "| "
