@@ -115,7 +115,6 @@ def initializeWindow():
             else:
                 # Failed :(
                 lblStatus.configure(text="Could not solve board. Try taking a better picture.")
-            puzzle.printBoardToConsole()
 
         frame = CTkFrame(parent)
         lblTitle = CTkLabel(frame, text="Solution Generator (Output)")
