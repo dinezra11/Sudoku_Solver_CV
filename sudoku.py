@@ -16,6 +16,7 @@ class Sudoku:
         :param board:       9x9 sudoku board.
                             Empty cells are indicated by zeros.
         """
+        self.initialBoard = list(board[i].copy() for i in range(9))
         self.board = board
         self.options = list(list(set(range(1, 10)) for _ in range(9)) for _ in range(9))
         self.emptyCells = 9 * 9  # If zero - the puzzle is solved!
@@ -98,3 +99,18 @@ class Sudoku:
         print()
         if printOpt:
             printMatrix(self.options)
+
+    def getBoard(self):
+        """ Return the array of the board. (Solved state) """
+        return self.board
+
+    def getSolution(self):
+        """ Return only the digits that are part of the solution. """
+        solution = list(self.board[i].copy() for i in range(9))
+
+        for i in range(9):
+            for j in range(9):
+                if self.initialBoard[i][j] != 0:
+                    solution[i][j] = 0
+
+        return solution
