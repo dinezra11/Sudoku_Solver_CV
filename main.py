@@ -105,8 +105,8 @@ def initializeWindow():
             frame.update()
             sleep(1)
             puzzle = Sudoku(a)
-            print(puzzle.solve())
 
+            print(puzzle.solve())
             puzzle.printBoardToConsole()
 
             # Done
@@ -125,7 +125,6 @@ def initializeWindow():
         lblImage.pack()
         lblStatus.pack(pady=(10, 0))
         progress.pack()
-
 
         return frame, solve
 
