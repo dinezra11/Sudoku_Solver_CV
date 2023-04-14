@@ -114,6 +114,17 @@ def digitRecognition(img):
     return results, img
 
 
+def drawDigitsOnTop(baseImg, board):
+    """ Draw the given board's values on top of the image. """
+    offset = IMAGE_SIZE // 9
+    for i in range(9):
+        for j in range(9):
+            if board[j][i] != 0:
+                cv.putText(baseImg, str(board[j][i]), (offset*i+7, offset*(j+1)-8), cv.FONT_HERSHEY_SIMPLEX, 1.5, (0,0,0))
+
+    return baseImg
+
+
 def loadImage(path):
     """ Get a path to the given Sudoku's board, analyze it and represent it as a 2D-array.
 

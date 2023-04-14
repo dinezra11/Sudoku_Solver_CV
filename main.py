@@ -96,22 +96,26 @@ def initializeWindow():
             # Analyze image (Board extraction)
             lblStatus.configure(text="Analyzing image..")
             frame.update()
-            a, b = imageAnalyze.loadImage(imgPath)
-            lblImage.configure(image=CTkImage(Image.fromarray(b), size=IMAGESIZE))
+            boardArr, boardImg = imageAnalyze.loadImage(imgPath)
+            lblImage.configure(image=CTkImage(Image.fromarray(boardImg), size=IMAGESIZE))
 
             # Attempt to solve the sudoku
             progress.set(0.5)
             lblStatus.configure(text="Solving sudoku..")
             frame.update()
-            sleep(1)
-            puzzle = Sudoku(a)
+            puzzle = Sudoku(boardArr)
+            if puzzle.solve():
+                # Success!
+                solvedImg = imageAnalyze.drawDigitsOnTop(boardImg, puzzle.getSolution())
+                lblImage.configure(image=CTkImage(Image.fromarray(solvedImg), size=IMAGESIZE))
 
-            print(puzzle.solve())
+                # Done
+                progress.set(1)
+                lblStatus.configure(text="Done.")
+            else:
+                # Failed :(
+                lblStatus.configure(text="Could not solve board. Try taking a better picture.")
             puzzle.printBoardToConsole()
-
-            # Done
-            progress.set(1)
-            lblStatus.configure(text="Done.")
 
         frame = CTkFrame(parent)
         lblTitle = CTkLabel(frame, text="Solution Generator (Output)")
