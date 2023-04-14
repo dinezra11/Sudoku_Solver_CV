@@ -8,6 +8,12 @@ Author:     Din Ezra     dinezra11@gmail.com
 from customtkinter import *
 from tkinter import filedialog as fd
 from PIL import Image
+from time import sleep
+
+import imageAnalyze
+from sudoku import Sudoku
+
+IMAGESIZE = (350, 350) # Constant
 
 
 def initializeWindow():
@@ -28,10 +34,12 @@ def initializeWindow():
 
         return frame
 
-    def inputFrame(parent):
+    def inputFrame(parent, solveFunc):
         """ Initialize the user-input frame.
 
         :param parent:          The parent frame for this frame.
+        :param solveFunc        The solving function from the output frame.
+        :return                 The frame's object.
         """
 
         def loadFile():
@@ -41,16 +49,17 @@ def initializeWindow():
             loadedImg = fd.askopenfilename(filetypes=types)
 
             if loadedImg not in (None, "", " "):
-                lblImage.configure(text="", image=CTkImage(Image.open(loadedImg), size=imageSize))
+                lblImage.configure(text="", image=CTkImage(Image.open(loadedImg), size=IMAGESIZE))
+                btnSolve.configure(command=lambda: solveFunc(loadedImg))
 
         def clear():
             lblImage.configure(text="", image=emptyImage)
+            btnSolve.configure(command=None)
 
         frame = CTkFrame(parent)
-        imageSize = (350, 350)
-        emptyImage = CTkImage(Image.new("RGBA", imageSize, (255, 0, 0, 0)), size=imageSize)
+        emptyImage = CTkImage(Image.new("RGBA", IMAGESIZE, (255, 0, 0, 0)), size=IMAGESIZE)
 
-        lblTitle = CTkLabel(frame, text="Input Example")
+        lblTitle = CTkLabel(frame, text="Load an Image as an Input")
         lblImage = CTkLabel(frame, text="", image=emptyImage)
 
         # Buttons Frame
@@ -73,11 +82,52 @@ def initializeWindow():
         """ Initialize the output frame.
 
         :param parent:          The parent frame for this frame.
+        :return                 The frame's object and a pointer to the solving function, so
+                                it can be accessed from the input frame.
         """
-        frame = CTkFrame(parent)
-        CTkLabel(frame, text="Output Example").pack()
 
-        return frame
+        def solve(imgPath):
+            # Reset progress bar
+            progress.stop()
+            progress.configure(mode="determinate")
+            progress.set(0)
+            frame.update()
+
+            # Analyze image (Board extraction)
+            lblStatus.configure(text="Analyzing image..")
+            frame.update()
+            a, b = imageAnalyze.loadImage(imgPath)
+            lblImage.configure(image=CTkImage(Image.fromarray(b), size=IMAGESIZE))
+
+            # Attempt to solve the sudoku
+            progress.set(0.5)
+            lblStatus.configure(text="Solving sudoku..")
+            frame.update()
+            sleep(1)
+            puzzle = Sudoku(a)
+            print(puzzle.solve())
+
+            puzzle.printBoardToConsole()
+
+            # Done
+            progress.set(1)
+            lblStatus.configure(text="Done.")
+
+        frame = CTkFrame(parent)
+        lblTitle = CTkLabel(frame, text="Solution Generator (Output)")
+        lblImage = CTkLabel(frame, text="", image=CTkImage(Image.new("RGBA", IMAGESIZE, (255, 0, 0, 0)), size=IMAGESIZE))
+        lblStatus = CTkLabel(frame, text='Load an image and click on "Solve!" to start..')
+        progress = CTkProgressBar(frame, orientation="horizontal", mode="indeterminate")
+        progress.start()
+
+        # Pack Frame
+        lblTitle.pack()
+        lblImage.pack()
+        lblStatus.pack(pady=(10, 0))
+        progress.pack()
+
+
+        return frame, solve
 
     def applicationFrame():
         """ Initialize the application frame.
@@ -85,8 +135,11 @@ def initializeWindow():
         """
         padx, pady = 10, 10
         frame = CTkFrame(root)
-        inputFrame(frame).pack(padx=padx, pady=pady, fill="both", side="left", expand=True)
-        outputFrame(frame).pack(padx=padx, pady=pady, fill="both", side="right", expand=True)
+        outFrame, solveFunc = outputFrame(frame)
+        inFrame = inputFrame(frame, solveFunc)
+
+        outFrame.pack(padx=padx, pady=pady, fill="both", side="right", expand=True)
+        inFrame.pack(padx=padx, pady=pady, fill="both", side="left", expand=True)
 
         return frame
 
