@@ -52,7 +52,7 @@ class Sudoku:
         while self.emptyCells != 0:
             tries += 1
             if tries == maxTry:
-                return False
+                return self.backTracking(0, 0)
             
             for i in range(len(self.board)):
                 for j in range(len(self.board[0])):
@@ -70,6 +70,50 @@ class Sudoku:
 
                         self.emptyCells -= 1
         return True
+
+    def backTracking(self, x, y):
+        """ Solve the sudoku using the back-tracking algorithm.
+        This algorithm will be used after the main algorithm reduced all of the possibilities as much as it could.
+        """
+        def validateMove(row, col, value):
+            block = (row // 3, col // 3) # The relevant block (3x3 square) of the current cell
+
+            # Validate horizontally and vertically
+            for i in range(9):
+                for j in range(9):
+                    if self.board[i][col] == value or self.board[row][j] == value:
+                        return False
+
+            # Validate the relevant block
+            for i in range(3*block[0], 3*(block[0]+1)):
+                for j in range(3*block[1], 3*(block[1]+1)):
+                    if self.board[i][j] == value:
+                        return False
+
+            return True
+
+        if y >= 9:
+            y = 0
+            x += 1
+        if x >= 9:
+            # Recursion reached the end of the board - a possible solution found!
+            for row in self.board:
+                if 0 in row:
+                    return False
+
+            return True
+        if len(self.options[x][y]) == 0:
+            return self.backTracking(x, y+1) # <- Recursive call!
+
+        for v in self.options[x][y]:
+            if validateMove(x, y, v):
+                self.board[x][y] = v
+                if self.backTracking(x, y+1):
+                    return True
+                else:
+                    self.board[x][y] = 0
+
+        return False
    
     def printBoardToConsole(self, printOpt=False):
         """ Print the sudoku board to the console. Also print the options matrix if needed.
