@@ -9,5 +9,13 @@ Of course that an error will occur if the given board is illegal or could not be
 3. Digit Recognition: After we have the Sudoku's board extracted from the original picture, we need to divide and extract each cell from the board so we can identify which digit it represents (or empty). I will need to use some pre-processing techniques in order to have a good accuracy from the predictions of the model. I will use a pre-trained deep learning model to classify the digits from the image.
 4. GUI: Using tkinter, create a friendly GUI so the user will be able to easily upload any picture to the application, and get automatically get the solution.
 
+## How to run the program
+To run the program, please make sure that you have all of the necessary packages installed in your environment.
+All of the packages are listed in the file "requirements.txt", so you can simply install them with the command "pip install -r requirements.txt".
+After everything is installed - run "main.py" script and the program will start.
+
+## Using the program
+The program is friendly and easy to use. You just need to load the image you want to analyze, then click on "Solve!", and the sudoku's solution will appear on the output frame (right side of the screen)!
+
 Hope you will enjoy my code! Any suggesstion will be appreciated.
 Din - dinezra11@gmail.com
