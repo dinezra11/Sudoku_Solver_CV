@@ -11,7 +11,7 @@ Of course that an error will occur if the given board is illegal or could not be
 
 ## How to run the program
 To run the program, please make sure that you have all of the necessary packages installed in your environment.
-All of the packages are listed in the file "requirements.txt", so you can simply install them with the command "pip install -r requirements.txt".
+All of the packages are listed in the file "requirements.txt", so you can simply install them with the command "pip install -r requirements.txt". <br>
 After everything is installed - run "main.py" script and the program will start.
 
 ## Using the program
